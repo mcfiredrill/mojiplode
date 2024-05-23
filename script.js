@@ -16,8 +16,8 @@ PIXI.utils.sayHello(type);
 let app = new PIXI.Application({
   view: document.getElementById("pixi"),
   autoResize: true,
-  resolution: devicePixelRatio,
   backgroundAlpha: 0,
+  resizeTo: window
 });
 
 app.stop();
@@ -76,7 +76,18 @@ channel.on("new:msg", (msg) => {
     //emojiSprite.src = url;
     //document.body.appendChild(emojiSprite);
     emojiSprites.push(emojiSprite);
+    emojiSprite.x = Math.random() * app.screen.width;
+    emojiSprite.y = Math.random() * app.screen.height;
+
     app.stage.addChild(emojiSprite);
+    setTimeout(() => {
+      for(let i = 0; i < emojiSprites.length; i++){ 
+        if(emojiSprites[i] === emojiSprite) {
+          emojiSprites.splice(i, 1)
+          app.stage.removeChild(emojiSprite);
+        }
+      };
+    }, 8000);
   });
 });
 
