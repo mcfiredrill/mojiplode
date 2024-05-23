@@ -4,6 +4,25 @@ const HOTDOG_URL = "wss://hotdog-lounge.herokuapp.com/socket";
 
 const urlPrefix = "https://datafruits.fm/assets/images/emojis/";
 
+let type = "WebGL";
+if (!PIXI.utils.isWebGLSupported()) {
+  type = "canvas";
+}
+
+PIXI.utils.sayHello(type);
+
+//Create a Pixi Application
+let app = new PIXI.Application({
+  	autoResize: true,
+  resolution: devicePixelRatio 
+                               });
+
+//Add the canvas that Pixi automatically created for you to the HTML document
+window.addEventListener('load', () => {
+  document.body.appendChild(app.view);
+});
+
+
 let socket = new Socket(HOTDOG_URL, {
 
   logger: function logger(/*kind, msg, data*/) {
@@ -42,4 +61,10 @@ channel.on("new:msg", msg => {
   const regex = /:(.*?):/g;
   let emojis = msg.body.match(regex).map((s) => s.slice(1, -1));
   console.log(emojis);
+  emojis.forEach(emoji => {
+    
+    //let emojiSprite = PIXI.Sprite.from(`${urlPrefix}${emoji}.png`);
+    let emojiSprite = new Img('')
+
+  });
 });
