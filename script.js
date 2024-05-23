@@ -4,6 +4,8 @@ const HOTDOG_URL = "wss://hotdog-lounge.herokuapp.com/socket";
 
 const urlPrefix = "https://datafruits.fm/assets/images/emojis/";
 
+const emojiSprites = [];
+
 let type = "WebGL";
 if (!PIXI.utils.isWebGLSupported()) {
   type = "canvas";
@@ -62,9 +64,18 @@ channel.on("new:msg", msg => {
   let emojis = msg.body.match(regex).map((s) => s.slice(1, -1));
   console.log(emojis);
   emojis.forEach(emoji => {
-    
-    //let emojiSprite = PIXI.Sprite.from(`${urlPrefix}${emoji}.png`);
-    let emojiSprite = new Img('')
+    let url = `${urlPrefix}${emoji}.png`;
+    //let emojiSprite = PIXI.Sprite.from(url);
+    let emojiSprite = new Image();
+    emojiSprite.src = url;
+    document.body.appendChild(emojiSprite);
+    emojiSprites.push(emojiSprite);
+  });
+});
 
+// do the animations
+app.ticker.add((delta) => {
+  emojiSprites.forEach(sprite => {
+    
   });
 });
