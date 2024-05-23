@@ -2,6 +2,8 @@
 console.log('hey');
 const HOTDOG_URL = "wss://hotdog-lounge.herokuapp.com/socket";
 
+const urlPrefix = "https://datafruits.fm/assets/images/emojis/";
+
 let socket = new Socket(HOTDOG_URL, {
 
   logger: function logger(/*kind, msg, data*/) {
@@ -33,4 +35,11 @@ channel.join().receive("ignore", function () {
 
 channel.on("authorized", msg => {
   console.log('HI ' + msg.user + ' you are now authorized');
+});
+
+channel.on("new:msg", msg => {
+  console.log(msg.body);
+  const regex = /:(.*?):/g;
+  let emojis = msg.body.match(regex).map((s) => s.slice(1, -1));
+  console.log(emojis);
 });
