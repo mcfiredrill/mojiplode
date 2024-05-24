@@ -14,10 +14,9 @@ PIXI.utils.sayHello(type);
 
 //Create a Pixi Application
 let app = new PIXI.Application({
-  view: document.getElementById("pixi"),
-  autoResize: true,
   backgroundAlpha: 0,
-  resizeTo: window
+  resizeTo: window,
+  backgroundColor: 0x00ff00
 });
 
 app.stop();

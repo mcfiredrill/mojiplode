@@ -113,6 +113,10 @@ END Glitch hello-app default styles
 body {
   font-family: HK Grotesk;
   background-color: var(--color-bg);
+   width: 100vw;
+ height: 100vh;
+  padding: 0;
+  margin: 0;
 }
 
 /* Page structure */
@@ -192,4 +196,9 @@ h2 {
 }
 .fileopener:hover {
   border-bottom:3px solid var(--color-secondary);
+}
+
+canvas { 
+ width: 100vw;
+ height: 100vh;
 }
