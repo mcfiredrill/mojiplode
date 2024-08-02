@@ -5,25 +5,20 @@ const urlPrefix = "https://datafruits.fm/assets/images/emojis/";
 
 const emojiSprites = [];
 
-let type = "WebGL";
-if (!PIXI.utils.isWebGLSupported()) {
-  type = "canvas";
-}
-
-PIXI.utils.sayHello(type);
-
 //Create a Pixi Application
-let app = new PIXI.Application({
+let app = new PIXI.Application()
+
+await app.init({
   backgroundAlpha: 0,
   resizeTo: window,
   backgroundColor: 0x00ff00,
 });
 
-app.stop();
+//app.stop();
 
 //Add the canvas that Pixi automatically created for you to the HTML document
 window.addEventListener("load", () => {
-  document.body.appendChild(app.view);
+  document.body.appendChild(app.canvas);
   app.start();
 });
 
@@ -64,23 +59,23 @@ channel.on("authorized", (msg) => {
 });
 
 async function loadEmoji(url) {
-  return await PIXI.Sprite.from(url);
+  try {
+    return await PIXI.Sprite.from(url);
+  } catch (error) {
+    console.log("error loading image: ", error);
+  }
 }
 
-channel.on("new:msg", (msg) => {
+channel.on("new:msg", async (msg) => {
   console.log(msg.body);
   const regex = /:(.*?):/g;
   let emojis = msg.body.match(regex).map((s) => s.slice(1, -1));
   console.log(emojis);
-  emojis.forEach((emoji) => {
+  emojis.forEach(async (emoji) => {
     let url = `${urlPrefix}${emoji}.png`;
     let emojiSprite;
-    try {
-      emojiSprite = loadEmoji(url);
-      console.log("sprite: ", emojiSprite);
-    } catch (error) {
-      console.log("couldnt load image: ", error);
-    }
+    emojiSprite = await loadEmoji(url);
+    console.log("sprite: ", emojiSprite);
     //let emojiSprite = new Image();
     //emojiSprite.src = url;
     //document.body.appendChild(emojiSprite);
