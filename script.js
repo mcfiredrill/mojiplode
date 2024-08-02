@@ -16,7 +16,7 @@ PIXI.utils.sayHello(type);
 let app = new PIXI.Application({
   backgroundAlpha: 0,
   resizeTo: window,
-  backgroundColor: 0x00ff00
+  backgroundColor: 0x00ff00,
 });
 
 app.stop();
@@ -63,6 +63,10 @@ channel.on("authorized", (msg) => {
   console.log("HI " + msg.user + " you are now authorized");
 });
 
+async function loadEmoji(url) {
+  return await PIXI.Sprite.from(url);
+}
+
 channel.on("new:msg", (msg) => {
   console.log(msg.body);
   const regex = /:(.*?):/g;
@@ -70,7 +74,13 @@ channel.on("new:msg", (msg) => {
   console.log(emojis);
   emojis.forEach((emoji) => {
     let url = `${urlPrefix}${emoji}.png`;
-    let emojiSprite = PIXI.Sprite.from(url);
+    let emojiSprite;
+    try {
+      emojiSprite = loadEmoji(url);
+      console.log("sprite: ", emojiSprite);
+    } catch (error) {
+      console.log("couldnt load image: ", error);
+    }
     //let emojiSprite = new Image();
     //emojiSprite.src = url;
     //document.body.appendChild(emojiSprite);
@@ -80,12 +90,12 @@ channel.on("new:msg", (msg) => {
 
     app.stage.addChild(emojiSprite);
     setTimeout(() => {
-      for(let i = 0; i < emojiSprites.length; i++){ 
-        if(emojiSprites[i] === emojiSprite) {
-          emojiSprites.splice(i, 1)
+      for (let i = 0; i < emojiSprites.length; i++) {
+        if (emojiSprites[i] === emojiSprite) {
+          emojiSprites.splice(i, 1);
           app.stage.removeChild(emojiSprite);
         }
-      };
+      }
     }, 8000);
   });
 });
