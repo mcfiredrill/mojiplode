@@ -543,6 +543,49 @@ console.log("hey");
       shortnames: [':ksd_spin:'],
       keywords: ['ksd_spin'],
     },
+    ':lol_grandpa:': {                                                                
+      custom: true,                                                                   
+      uc_base: 'lol_grandpa',              
+      uc_output: '',                       
+      shortnames: [':lol_grandpa:'],                                                  
+      keywords: ['lol_grandpa'],           
+    },                                     
+    ':typing:': {                          
+      custom: true,                                                                                                                                                          
+      uc_base: 'typing',                   
+      uc_output: '',                       
+      shortnames: [':typing:'],            
+      keywords: ['typing'],                
+    },                                     
+    ':hacker:': {                          
+      custom: true,                        
+      uc_base: 'hacker',                   
+      uc_output: '',                       
+      shortnames: [':hacker:'],            
+      keywords: ['hacker'],                
+    },                                     
+    ':datafruits_bag:': {                  
+      custom: true,                        
+      uc_base: 'datafruits_bag',           
+      uc_output: '',                       
+      shortnames: [':datafruits_bag:'],                                               
+      keywords: ['datafruits_bag'],                                                   
+    },                                     
+    ':the_ravers:': {                      
+      custom: true,                        
+      uc_base: 'the_ravers',               
+      uc_output: '',                       
+      shortnames: [':the_ravers:'],                                                   
+      keywords: ['the_ravers'],            
+    },                                     
+    ':mega_beamsprout:': {                 
+      custom: true,                        
+      animated: true,                      
+      uc_base: 'mega_beamsprout',          
+      uc_output: '',                       
+      shortnames: [':mega_beamsprout:'],                                              
+      keywords: ['mega_beamsprout'],                                                  
+    },   
   };
 
 const HOTDOG_URL = "wss://hotdog-lounge.herokuapp.com/socket";
