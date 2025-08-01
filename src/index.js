@@ -1,3 +1,5 @@
+import { parseGIF, decompressFrames } from 'gifuct-js';
+
 console.log("hey");
   const customEmojis = {
     ':bgs:': {
@@ -543,49 +545,49 @@ console.log("hey");
       shortnames: [':ksd_spin:'],
       keywords: ['ksd_spin'],
     },
-    ':lol_grandpa:': {                                                                
-      custom: true,                                                                   
-      uc_base: 'lol_grandpa',              
-      uc_output: '',                       
-      shortnames: [':lol_grandpa:'],                                                  
-      keywords: ['lol_grandpa'],           
-    },                                     
-    ':typing:': {                          
-      custom: true,                                                                                                                                                          
-      uc_base: 'typing',                   
-      uc_output: '',                       
-      shortnames: [':typing:'],            
-      keywords: ['typing'],                
-    },                                     
-    ':hacker:': {                          
-      custom: true,                        
-      uc_base: 'hacker',                   
-      uc_output: '',                       
-      shortnames: [':hacker:'],            
-      keywords: ['hacker'],                
-    },                                     
-    ':datafruits_bag:': {                  
-      custom: true,                        
-      uc_base: 'datafruits_bag',           
-      uc_output: '',                       
-      shortnames: [':datafruits_bag:'],                                               
-      keywords: ['datafruits_bag'],                                                   
-    },                                     
-    ':the_ravers:': {                      
-      custom: true,                        
-      uc_base: 'the_ravers',               
-      uc_output: '',                       
-      shortnames: [':the_ravers:'],                                                   
-      keywords: ['the_ravers'],            
-    },                                     
-    ':mega_beamsprout:': {                 
-      custom: true,                        
-      animated: true,                      
-      uc_base: 'mega_beamsprout',          
-      uc_output: '',                       
-      shortnames: [':mega_beamsprout:'],                                              
-      keywords: ['mega_beamsprout'],                                                  
-    },   
+    ':lol_grandpa:': {
+      custom: true,
+      uc_base: 'lol_grandpa',
+      uc_output: '',
+      shortnames: [':lol_grandpa:'],
+      keywords: ['lol_grandpa'],
+    },
+    ':typing:': {
+      custom: true,
+      uc_base: 'typing',
+      uc_output: '',
+      shortnames: [':typing:'],
+      keywords: ['typing'],
+    },
+    ':hacker:': {
+      custom: true,
+      uc_base: 'hacker',
+      uc_output: '',
+      shortnames: [':hacker:'],
+      keywords: ['hacker'],
+    },
+    ':datafruits_bag:': {
+      custom: true,
+      uc_base: 'datafruits_bag',
+      uc_output: '',
+      shortnames: [':datafruits_bag:'],
+      keywords: ['datafruits_bag'],
+    },
+    ':the_ravers:': {
+      custom: true,
+      uc_base: 'the_ravers',
+      uc_output: '',
+      shortnames: [':the_ravers:'],
+      keywords: ['the_ravers'],
+    },
+    ':mega_beamsprout:': {
+      custom: true,
+      animated: true,
+      uc_base: 'mega_beamsprout',
+      uc_output: '',
+      shortnames: [':mega_beamsprout:'],
+      keywords: ['mega_beamsprout'],
+    },
   };
 
 const HOTDOG_URL = "wss://hotdog-lounge.herokuapp.com/socket";
@@ -593,6 +595,41 @@ const HOTDOG_URL = "wss://hotdog-lounge.herokuapp.com/socket";
 const urlPrefix = "https://datafruits.fm/assets/images/emojis/";
 
 const emojiSprites = [];
+
+async function loadGifEmoji(name) {
+  const response = await fetch(`${urlPrefix}${name}.gif`);
+  console.log('fetch');
+  const buffer = await response.arrayBuffer();
+
+  const gif = parseGIF(buffer);
+  const frames = decompressFrames(gif, true);
+  console.log('parse frames');
+
+  const textures = frames.map((frame) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = frame.dims.width;
+    canvas.height = frame.dims.height;
+    const ctx = canvas.getContext('2d');
+
+    const imageData = new ImageData(
+      new Uint8ClampedArray(frame.patch),
+      frame.dims.width,
+      frame.dims.height
+    );
+    ctx.putImageData(imageData, 0, 0);
+
+    const baseTexture = PIXI.BaseTexture.from(canvas);
+    return new PIXI.Texture(baseTexture);
+  });
+
+  const anim = new PIXI.AnimatedSprite(textures);
+  anim.animationSpeed = 1 / 6;
+  anim.loop = true;
+  anim.play();
+
+  return anim;
+}
+
 
 let type = "WebGL";
 if (!PIXI.utils.isWebGLSupported()) {
@@ -653,40 +690,44 @@ channel.on("authorized", (msg) => {
 });
 
 
-channel.on("new:msg", (msg) => {
+function addSpriteToStage(sprite) {
+  emojiSprites.push(sprite);
+  sprite.x = Math.random() * app.screen.width;
+  sprite.y = Math.random() * app.screen.height;
+  sprite.rotation = Math.random() * 360;
+  sprite.rotationSpeed = Math.random() * (0.08 - 0.01) + 0.01;
+
+  app.stage.addChild(sprite);
+  setTimeout(() => {
+    for (let i = 0; i < emojiSprites.length; i++) {
+      if (emojiSprites[i] === sprite) {
+        emojiSprites.splice(i, 1);
+        app.stage.removeChild(sprite);
+      }
+    }
+  }, 8000);
+}
+
+channel.on("new:msg", async (msg) => {
   console.log(msg.body);
   const regex = /:(.*?):/g;
-  let emojis = msg.body.match(regex).map((s) => s.slice(1, -1));
-  console.log(emojis);
-  emojis.forEach((emoji) => {
-    if(customEmojis[`:${emoji}:`].animated) {
-      console.log('this is a gif emoji');
-    } else {
-      let url = `${urlPrefix}${emoji}.png`;
+  let emojis = msg.body.match(regex)?.map((s) => s.slice(1, -1));
+  if(emojis) {
+    console.log(emojis);
+    for (const emoji of emojis) {
       let emojiSprite;
-      emojiSprite = PIXI.Sprite.from(url);
-      console.log("sprite: ", emojiSprite);
-      //let emojiSprite = new Image();
-      //emojiSprite.src = url;
-      //document.body.appendChild(emojiSprite);
-      emojiSprites.push(emojiSprite);
-      emojiSprite.x = Math.random() * app.screen.width;
-      emojiSprite.y = Math.random() * app.screen.height;
-      emojiSprite.rotation = Math.random() * 360;
-      emojiSprite.rotationSpeed = Math.random() * (0.08 - 0.01) + 0.01;
-
-      app.stage.addChild(emojiSprite);
-      setTimeout(() => {
-        for (let i = 0; i < emojiSprites.length; i++) {
-          if (emojiSprites[i] === emojiSprite) {
-            emojiSprites.splice(i, 1);
-            app.stage.removeChild(emojiSprite);
-          }
-        }
-      }, 8000);    
+      if(customEmojis[`:${emoji}:`].animated) {
+        console.log('this is a gif emoji');
+        emojiSprite = await loadGifEmoji(emoji);
+        console.log('loaded gif emoji');
+      } else {
+        let url = `${urlPrefix}${emoji}.png`;
+        emojiSprite = PIXI.Sprite.from(url);
+        console.log("sprite: ", emojiSprite);
+      }
+      addSpriteToStage(emojiSprite);
     }
-
-  });
+  }
 });
 
 // do the animations
