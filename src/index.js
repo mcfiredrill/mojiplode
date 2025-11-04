@@ -588,6 +588,28 @@ console.log("hey");
       shortnames: [':mega_beamsprout:'],
       keywords: ['mega_beamsprout'],
     },
+    ':pickles:': {
+      custom: true,
+      uc_base: 'pickles',
+      uc_output: '',
+      shortnames: [':pickles:'],
+      keywords: ['pickles'],
+    },
+    ':cow:': {
+      custom: true,
+      uc_base: 'cow',
+      uc_output: '',
+      shortnames: [':cow:'],
+      keywords: ['cow'],
+    },
+    ':cereal:': {
+      custom: true,
+      uc_base: 'cereal',
+      uc_output: '',
+      shortnames: [':cereal:'],
+      keywords: ['cereal'],
+      animated: true
+    },
   };
 
 const HOTDOG_URL = "wss://hotdog-lounge.herokuapp.com/socket";
