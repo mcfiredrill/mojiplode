@@ -716,16 +716,18 @@ channel.on("new:msg", async (msg) => {
     console.log(emojis);
     for (const emoji of emojis) {
       let emojiSprite;
-      if(customEmojis[`:${emoji}:`].animated) {
-        console.log('this is a gif emoji');
-        emojiSprite = await loadGifEmoji(emoji);
-        console.log('loaded gif emoji');
-      } else {
-        let url = `${urlPrefix}${emoji}.png`;
-        emojiSprite = PIXI.Sprite.from(url);
-        console.log("sprite: ", emojiSprite);
+      if(customEmojis[`:${emoji}:`]) {
+        if(customEmojis[`:${emoji}:`].animated) {
+          console.log('this is a gif emoji');
+          emojiSprite = await loadGifEmoji(emoji);
+          console.log('loaded gif emoji');
+        } else {
+          let url = `${urlPrefix}${emoji}.png`;
+          emojiSprite = PIXI.Sprite.from(url);
+          console.log("sprite: ", emojiSprite);
+        }
+        addSpriteToStage(emojiSprite);
       }
-      addSpriteToStage(emojiSprite);
     }
   }
 });
