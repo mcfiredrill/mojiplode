@@ -1,4 +1,15 @@
-import { parseGIF, decompressFrames } from 'gifuct-js';
+function appendMsg(msg) {
+  const li = document.createElement("li");
+
+  const span = document.createElement("span");
+  span.textContent = `${msg.user}: `;
+
+  li.appendChild(span);
+  li.append(msg.body);
+
+  document.getElementById("messages").appendChild(li);
+
+}
 
 console.log("hey");
   const customEmojis = {
@@ -594,65 +605,6 @@ const HOTDOG_URL = "wss://hotdog-lounge.herokuapp.com/socket";
 
 const urlPrefix = "https://datafruits.fm/assets/images/emojis/";
 
-const emojiSprites = [];
-
-async function loadGifEmoji(name) {
-  const response = await fetch(`${urlPrefix}${name}.gif`);
-  console.log('fetch');
-  const buffer = await response.arrayBuffer();
-
-  const gif = parseGIF(buffer);
-  const frames = decompressFrames(gif, true);
-  console.log('parse frames');
-
-  const textures = frames.map((frame) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = frame.dims.width;
-    canvas.height = frame.dims.height;
-    const ctx = canvas.getContext('2d');
-
-    const imageData = new ImageData(
-      new Uint8ClampedArray(frame.patch),
-      frame.dims.width,
-      frame.dims.height
-    );
-    ctx.putImageData(imageData, 0, 0);
-
-    const baseTexture = PIXI.BaseTexture.from(canvas);
-    return new PIXI.Texture(baseTexture);
-  });
-
-  const anim = new PIXI.AnimatedSprite(textures);
-  anim.animationSpeed = 1 / 6;
-  anim.loop = true;
-  anim.play();
-
-  return anim;
-}
-
-
-let type = "WebGL";
-if (!PIXI.utils.isWebGLSupported()) {
-  type = "canvas";
-}
-
-PIXI.utils.sayHello(type);
-
-//Create a Pixi Application
-let app = new PIXI.Application({
-  backgroundAlpha: 0,
-  resizeTo: window,
-  backgroundColor: 0x00ff00,
-});
-
-app.stop();
-
-//Add the canvas that Pixi automatically created for you to the HTML document
-window.addEventListener("load", () => {
-  document.body.appendChild(app.view);
-  app.start();
-});
-
 let socket = new Socket(HOTDOG_URL, {
   logger: function logger(/*kind, msg, data*/) {
     //console.log(kind + ": " + msg, data);
@@ -690,55 +642,7 @@ channel.on("authorized", (msg) => {
 });
 
 
-function addSpriteToStage(sprite) {
-  emojiSprites.push(sprite);
-  sprite.x = Math.random() * app.screen.width;
-  sprite.y = Math.random() * app.screen.height;
-  sprite.rotation = Math.random() * 360;
-  sprite.rotationSpeed = Math.random() * (0.08 - 0.01) + 0.01;
-
-  app.stage.addChild(sprite);
-  setTimeout(() => {
-    for (let i = 0; i < emojiSprites.length; i++) {
-      if (emojiSprites[i] === sprite) {
-        emojiSprites.splice(i, 1);
-        app.stage.removeChild(sprite);
-      }
-    }
-  }, 8000);
-}
-
 channel.on("new:msg", async (msg) => {
-  console.log(msg.body);
-  const regex = /:(.*?):/g;
-  let emojis = msg.body.match(regex)?.map((s) => s.slice(1, -1));
-  if(emojis) {
-    console.log(emojis);
-    for (const emoji of emojis) {
-      let emojiSprite;
-      if(customEmojis[`:${emoji}:`].animated) {
-        console.log('this is a gif emoji');
-        emojiSprite = await loadGifEmoji(emoji);
-        console.log('loaded gif emoji');
-      } else {
-        let url = `${urlPrefix}${emoji}.png`;
-        emojiSprite = PIXI.Sprite.from(url);
-        console.log("sprite: ", emojiSprite);
-      }
-      addSpriteToStage(emojiSprite);
-    }
-  }
-});
-
-// do the animations
-let count = 0.0;
-app.ticker.add((delta) => {
-  emojiSprites.forEach((sprite) => {
-    sprite.x += Math.sin(count);
-    sprite.y += Math.cos(count);
-    sprite.scale.x += Math.sin(count) * 0.01;
-    sprite.scale.y += Math.sin(count) * 0.01;
-    sprite.rotation += Math.sin(count) * sprite.rotationSpeed;
-  });
-  count += 0.02 * delta;
+  console.log(msg);
+  appendMsg(msg);
 });
